@@ -323,11 +323,14 @@ const MyListings = () => {
               </select>
             </div>
             <div className="modal-action">
-              <button className="btn btn-primary" onClick={handleUpdate}>
+              <button
+                className="btn btn-primary rounded-full"
+                onClick={handleUpdate}
+              >
                 Update Car
               </button>
               <button
-                className="btn btn-outline"
+                className="btn btn-outline rounded-full"
                 onClick={() => setIsModalOpen(false)}
               >
                 Cancel
