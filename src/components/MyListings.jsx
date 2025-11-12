@@ -130,7 +130,7 @@ const MyListings = () => {
   };
 
   return (
-    <div className="container px-6 py-10 mx-auto">
+    <div className="container px-6 py-10 mx-auto mt-16">
       <div className="flex flex-col items-center mb-10">
         <div className="flex items-center gap-2 text-4xl font-extrabold text-gray-800">
           <FaCar className="text-primary" />
