@@ -22,6 +22,8 @@ const CarDetails = () => {
     }
 
     try {
+      const token = await user.getIdToken(); // Firebase token
+
       const bookingData = {
         carId: car._id,
         carName: car.carName,
@@ -37,21 +39,28 @@ const CarDetails = () => {
         status: "booked",
       };
 
-      // POST booking using Axios
+      // POST booking with token in headers
       const { data } = await axios.post(
         "https://rent-wheels-api-server.vercel.app/bookings",
-        bookingData
+        bookingData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       if (data.insertedId) {
-        // Update car status in frontend
         setCarStatus("booked");
 
-        // Optional: Update car status in backend
+        // Update car status in backend
         await axios.patch(
           `https://rent-wheels-api-server.vercel.app/cars/${car._id}`,
+          { status: "booked" },
           {
-            status: "booked",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
 
@@ -67,7 +76,8 @@ const CarDetails = () => {
       console.error(error);
       Swal.fire(
         "Error",
-        error.response?.data?.message || "Something went wrong.",
+        error.response?.data?.message ||
+          "Unauthorized or something went wrong.",
         "error"
       );
     }
