@@ -318,8 +318,8 @@ const MyListings = () => {
                 value={formData.status}
                 onChange={handleChange}
               >
-                <option>Available</option>
-                <option>Booked</option>
+                <option>available</option>
+                <option>booked</option>
               </select>
             </div>
             <div className="modal-action">
