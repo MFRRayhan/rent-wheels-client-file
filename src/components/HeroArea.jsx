@@ -42,7 +42,7 @@ const HeroArea = () => {
   });
 
   return (
-    <section className="z-10 relative w-full h-[600px] md:h-[750px]">
+    <section className="z-10 relative w-full h-[600px] md:h-[750px] mt-16">
       {/* Swiper Slider */}
       <Swiper
         modules={[Autoplay, Pagination, Navigation]}

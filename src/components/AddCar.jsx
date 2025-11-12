@@ -83,7 +83,7 @@ const AddCar = ({ onCarAdded }) => {
   };
 
   return (
-    <div className="max-w-4xl p-8 mx-auto mt-12 bg-white shadow-xl rounded-2xl">
+    <div className="max-w-4xl p-8 mx-auto bg-white shadow-xl rounded-2xl mt-16">
       <h2 className="mb-8 text-4xl font-extrabold text-center text-gray-900">
         Add a New Car
       </h2>

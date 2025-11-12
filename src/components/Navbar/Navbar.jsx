@@ -69,14 +69,14 @@ const Navbar = () => {
   );
 
   return (
-    <div className="shadow-sm header-nav">
+    <div className="shadow-sm fixed top-0 left-0 w-full z-50 bg-white">
       <div className="container mx-auto">
         <div className="navbar">
           {/* Left section */}
           <div className="flex items-center navbar-start">
             {/* Hamburger Menu */}
             <div
-              className="lg:hidden z-auto"
+              className="lg:hidden z-50"
               onClick={() => setMenuOpen(!menuOpen)}
             >
               <svg
@@ -177,7 +177,7 @@ const Navbar = () => {
 
       {/* Mobile Menu (visible on small screens) */}
       <div
-        className={`lg:hidden fixed top-0 left-0 w-full bg-gray-800 bg-opacity-80 ${
+        className={`lg:hidden fixed top-0 left-0 w-full bg-gray-800 bg-opacity-80 z-50 ${
           menuOpen ? "block" : "hidden"
         }`}
       >
