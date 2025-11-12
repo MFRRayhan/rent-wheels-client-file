@@ -39,7 +39,7 @@ const BrowseCars = () => {
     >
       <div className="container px-6 mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-center gap-2 mb-8 text-4xl font-extrabold text-gray-800">
+        <div className="flex mt-16 items-center justify-center gap-2 mb-8 text-4xl font-extrabold text-gray-800">
           <FaCar className="text-primary" />
           <h2>Browse Cars</h2>
         </div>
