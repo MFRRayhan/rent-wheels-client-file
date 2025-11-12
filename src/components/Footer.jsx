@@ -83,13 +83,13 @@ export default function Footer({ siteName = "RentWheels" }) {
               </Link>
             </li>
             <li>
-              <Link to="/my-listings" className="hover:text-white">
-                My Listings
+              <Link to="/my-listing" className="hover:text-white">
+                My Listing
               </Link>
             </li>
             <li>
-              <Link to="/my-bookings" className="hover:text-white">
-                My Bookings
+              <Link to="/my-booking" className="hover:text-white">
+                My Booking
               </Link>
             </li>
           </ul>

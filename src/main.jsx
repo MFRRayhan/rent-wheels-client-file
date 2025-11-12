@@ -9,6 +9,7 @@ import CarDetails from "./components/CarDetails/CarDetails.jsx";
 import Home from "./components/Home/Home.jsx";
 import MyBookings from "./components/MyBookings.jsx";
 import MyListings from "./components/MyListings.jsx";
+import NotFound from "./components/NotFound.jsx";
 import Profile from "./components/Profile.jsx";
 import Register from "./components/Register/Register.jsx";
 import AuthProvider from "./contexts/AuthProvider.jsx";
@@ -75,6 +76,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "*",
+        element: <NotFound />,
       },
     ],
   },
