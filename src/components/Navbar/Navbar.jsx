@@ -69,7 +69,7 @@ const Navbar = () => {
   );
 
   return (
-    <div className="shadow-sm fixed top-0 left-0 w-full z-50 bg-white">
+    <div className="header-nav shadow-sm fixed top-0 left-0 w-full z-50 bg-white">
       <div className="container mx-auto">
         <div className="navbar">
           {/* Left section */}

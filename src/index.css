@@ -24,3 +24,7 @@ button {
 button:disabled {
   @apply cursor-not-allowed;
 }
+
+.header-nav ul li a.active {
+  @apply text-primary font-semibold;
+}
