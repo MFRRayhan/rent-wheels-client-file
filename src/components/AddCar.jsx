@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { AuthContext } from "../contexts/AuthContext";
-import useAxiosSecure from "../hooks/useAxiosSecure"; // secure axios hook import
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
-const AddCar = ({ onCarAdded }) => {
+const AddCar = ({ carToEdit, onCarAddedOrUpdated }) => {
   const { user } = useContext(AuthContext);
   const axiosSecure = useAxiosSecure();
 
@@ -19,6 +19,7 @@ const AddCar = ({ onCarAdded }) => {
     providerEmail: "",
   });
 
+  // Set provider info
   useEffect(() => {
     if (user) {
       setCarData((prev) => ({
@@ -28,6 +29,13 @@ const AddCar = ({ onCarAdded }) => {
       }));
     }
   }, [user]);
+
+  // If editing, populate form with existing car
+  useEffect(() => {
+    if (carToEdit) {
+      setCarData(carToEdit);
+    }
+  }, [carToEdit]);
 
   const handleChange = (e) => {
     setCarData({ ...carData, [e.target.name]: e.target.value });
@@ -40,44 +48,62 @@ const AddCar = ({ onCarAdded }) => {
       return Swal.fire({
         icon: "error",
         title: "Not Logged In",
-        text: "Please login first to add a car.",
+        text: "Please login first to add or update a car.",
       });
     }
 
     try {
-      const res = await axiosSecure.post("/cars", carData);
-
-      if (res.data.insertedId || res.status === 200) {
-        Swal.fire({
-          icon: "success",
-          title: "Car Added Successfully",
-          showConfirmButton: false,
-          timer: 2000,
-        });
-        if (onCarAdded) onCarAdded(res.data);
-        setCarData({
-          carName: "",
-          description: "",
-          category: "Sedan",
-          rentPrice: "",
-          location: "",
-          image: "",
-          status: "available",
-          providerName: user.displayName || "",
-          providerEmail: user.email || "",
-        });
+      let res;
+      if (carToEdit?._id) {
+        // ================= PATCH (Edit Mode) =================
+        res = await axiosSecure.patch(`/cars/${carToEdit._id}`, carData);
+        if (res.data.modifiedCount) {
+          Swal.fire({
+            icon: "success",
+            title: "Car Updated Successfully",
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        } else {
+          Swal.fire({
+            icon: "info",
+            title: "No Changes Made",
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        }
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Failed to add car",
-          text: res.data.message || "Something went wrong",
-        });
+        // ================= POST (Add Mode) =================
+        res = await axiosSecure.post("/cars", carData);
+        if (res.data.insertedId) {
+          Swal.fire({
+            icon: "success",
+            title: "Car Added Successfully",
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        }
       }
+
+      if (onCarAddedOrUpdated) onCarAddedOrUpdated(res.data);
+
+      // Reset form
+      setCarData({
+        carName: "",
+        description: "",
+        category: "Sedan",
+        rentPrice: "",
+        location: "",
+        image: "",
+        status: "available",
+        providerName: user.displayName || "",
+        providerEmail: user.email || "",
+      });
     } catch (err) {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: err.message,
+        text: err.response?.data?.message || err.message,
       });
     }
   };
@@ -85,7 +111,7 @@ const AddCar = ({ onCarAdded }) => {
   return (
     <div className="max-w-4xl p-8 mx-auto bg-white shadow-xl rounded-2xl mt-16">
       <h2 className="mb-8 text-4xl font-extrabold text-center text-gray-900">
-        Add a New Car
+        {carToEdit?._id ? "Edit Car" : "Add a New Car"}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -238,7 +264,7 @@ const AddCar = ({ onCarAdded }) => {
           type="submit"
           className="block w-full py-3 mx-auto font-bold text-white transition-all duration-300 shadow-lg bg-primary md:w-1/2 hover:bg-[#425ad5] rounded-full"
         >
-          Add Car
+          {carToEdit?._id ? "Update Car" : "Add Car"}
         </button>
       </form>
     </div>

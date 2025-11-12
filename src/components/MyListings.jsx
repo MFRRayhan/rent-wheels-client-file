@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { BsFillFuelPumpFill } from "react-icons/bs";
 import {
   FaCar,
@@ -10,9 +10,10 @@ import {
 import { Link } from "react-router";
 import Swal from "sweetalert2";
 import { AuthContext } from "../contexts/AuthContext";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const MyListings = () => {
-  const { user } = use(AuthContext);
+  const { user } = useContext(AuthContext);
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -27,6 +28,9 @@ const MyListings = () => {
     status: "Available",
   });
 
+  const axiosSecure = useAxiosSecure(); // if using token header
+
+  // Fetch user's cars
   useEffect(() => {
     const fetchCars = async () => {
       if (!user?.email) return;
@@ -34,7 +38,7 @@ const MyListings = () => {
       setError(null);
       try {
         const res = await fetch(
-          `http://localhost:3000/cars/provider/${encodeURIComponent(
+          `https://rent-wheels-api-server.vercel.app/cars/provider/${encodeURIComponent(
             user.email
           )}`
         );
@@ -51,6 +55,7 @@ const MyListings = () => {
     fetchCars();
   }, [user?.email]);
 
+  // Open modal and populate form
   const openModal = (car) => {
     setSelectedCar(car);
     setFormData({
@@ -72,15 +77,28 @@ const MyListings = () => {
     }));
   };
 
+  // ===================== Updated handleUpdate =====================
   const handleUpdate = async () => {
+    if (!user) return Swal.fire({ icon: "error", title: "Not logged in" });
+
     try {
-      const res = await fetch(`http://localhost:3000/cars/${selectedCar._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const token = await user.getIdToken(); // get Firebase token
+      const res = await fetch(
+        `https://rent-wheels-api-server.vercel.app/cars/${selectedCar._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
       const result = await res.json();
-      if (res.ok && result.success) {
+
+      if (res.ok && result.modifiedCount > 0) {
+        // Update UI live
         setCars((prev) =>
           prev.map((c) =>
             c._id === selectedCar._id ? { ...c, ...formData } : c
@@ -93,12 +111,23 @@ const MyListings = () => {
           showConfirmButton: false,
           timer: 1500,
         });
-      } else throw new Error("Update failed");
+      } else if (res.ok && result.modifiedCount === 0) {
+        Swal.fire({
+          icon: "info",
+          title: "No changes made",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } else {
+        throw new Error(result.message || "Update failed");
+      }
     } catch (err) {
       Swal.fire({ icon: "error", title: "Update Failed", text: err.message });
     }
   };
+  // ===================== End handleUpdate =====================
 
+  // Delete car
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
@@ -110,12 +139,18 @@ const MyListings = () => {
       confirmButtonText: "Yes, delete it!",
     });
     if (!confirm.isConfirmed) return;
+
     try {
-      const res = await fetch(`http://localhost:3000/cars/${id}`, {
-        method: "DELETE",
-      });
+      const token = await user.getIdToken(); // Firebase token
+      const res = await fetch(
+        `https://rent-wheels-api-server.vercel.app/cars/${id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const result = await res.json();
-      if (res.ok && (result.deletedCount > 0 || result.success)) {
+      if (res.ok && result.success) {
         setCars((prev) => prev.filter((c) => c._id !== id));
         Swal.fire({
           icon: "success",
@@ -129,6 +164,7 @@ const MyListings = () => {
     }
   };
 
+  // ===================== Return JSX =====================
   return (
     <div className="container px-6 py-10 mx-auto mt-16">
       <div className="flex flex-col items-center mb-10">
@@ -141,6 +177,7 @@ const MyListings = () => {
           remove any car anytime.
         </p>
       </div>
+
       {loading && (
         <div className="text-lg font-medium text-center text-gray-600">
           Fetching your cars...
@@ -166,6 +203,7 @@ const MyListings = () => {
           </Link>
         </div>
       )}
+
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {cars.map((car) => (
           <div
@@ -218,6 +256,7 @@ const MyListings = () => {
           </div>
         ))}
       </div>
+
       {isModalOpen && (
         <div className="modal modal-open">
           <div className="max-w-lg modal-box">

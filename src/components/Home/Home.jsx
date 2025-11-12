@@ -9,7 +9,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3000/featured-cars")
+    fetch("https://rent-wheels-api-server.vercel.app/featured-cars")
       .then((res) => res.json())
       .then((data) => {
         setFeaturedCars(data);

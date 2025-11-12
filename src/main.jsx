@@ -34,12 +34,12 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
         loader: ({ params }) =>
-          fetch(`http://localhost:3000/cars/${params.id}`),
+          fetch(`https://rent-wheels-api-server.vercel.app/cars/${params.id}`),
       },
       {
         path: "/browse-cars",
         element: <BrowseCars />,
-        loader: () => fetch("http://localhost:3000/cars"),
+        loader: () => fetch("https://rent-wheels-api-server.vercel.app/cars"),
       },
       {
         path: "/add-car",

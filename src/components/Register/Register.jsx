@@ -41,11 +41,14 @@ function Register() {
       const newUser = { name, email, photoURL, createdAt: new Date() };
 
       // 4️⃣ Send to backend
-      const response = await fetch("http://localhost:3000/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newUser),
-      });
+      const response = await fetch(
+        "https://rent-wheels-api-server.vercel.app/users",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newUser),
+        }
+      );
 
       const data = await response.json();
       if (data.message === "User already exists") {
@@ -73,11 +76,14 @@ function Register() {
         createdAt: new Date(),
       };
 
-      const response = await fetch("http://localhost:3000/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newUser),
-      });
+      const response = await fetch(
+        "https://rent-wheels-api-server.vercel.app/users",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newUser),
+        }
+      );
 
       const data = await response.json();
       if (data.message === "User already exists") {

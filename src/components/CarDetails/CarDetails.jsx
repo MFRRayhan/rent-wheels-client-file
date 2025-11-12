@@ -39,7 +39,7 @@ const CarDetails = () => {
 
       // POST booking using Axios
       const { data } = await axios.post(
-        "http://localhost:3000/bookings",
+        "https://rent-wheels-api-server.vercel.app/bookings",
         bookingData
       );
 
@@ -48,9 +48,12 @@ const CarDetails = () => {
         setCarStatus("booked");
 
         // Optional: Update car status in backend
-        await axios.patch(`http://localhost:3000/cars/${car._id}`, {
-          status: "booked",
-        });
+        await axios.patch(
+          `https://rent-wheels-api-server.vercel.app/cars/${car._id}`,
+          {
+            status: "booked",
+          }
+        );
 
         Swal.fire(
           "Booked!",
