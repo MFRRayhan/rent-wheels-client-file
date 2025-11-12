@@ -82,7 +82,7 @@ const MyBookings = () => {
     );
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
+    <div className="max-w-6xl mx-auto px-4 py-12 mt-16">
       <div className="flex items-center justify-center gap-2 mb-8 text-4xl font-extrabold text-gray-800">
         <FaCar className="text-primary" />
         <h2>My Bookings</h2>
