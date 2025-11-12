@@ -7,35 +7,23 @@ import { GrUserManager } from "react-icons/gr";
 import { LuDollarSign } from "react-icons/lu";
 import Swal from "sweetalert2";
 import { AuthContext } from "../contexts/AuthContext";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 const MyBookings = () => {
   const { user } = useContext(AuthContext);
+  const axiosSecure = useAxiosSecure();
+
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetch bookings
   useEffect(() => {
     if (!user?.email) return;
 
     const fetchBookings = async () => {
       try {
-        // Firebase token পাওয়া
-        const token = await user.getIdToken();
-
-        const res = await fetch(
-          `http://localhost:3000/bookings?email=${user.email}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch bookings");
-        }
-
-        const data = await res.json();
-        setBookings(data); // data অবশ্যই array হবে
+        const { data } = await axiosSecure.get(`/bookings?email=${user.email}`);
+        setBookings(data);
       } catch (error) {
         console.error("Failed to fetch bookings:", error);
       } finally {
@@ -44,10 +32,11 @@ const MyBookings = () => {
     };
 
     fetchBookings();
-  }, [user]);
+  }, [user, axiosSecure]);
 
-  const handleDelete = (bookingId) => {
-    Swal.fire({
+  // Delete booking + update car status
+  const handleDelete = async (bookingId, carId) => {
+    const result = await Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
       icon: "warning",
@@ -55,42 +44,32 @@ const MyBookings = () => {
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, cancel booking!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const token = await user.getIdToken();
-          const res = await fetch(
-            `http://localhost:3000/bookings/${bookingId}`,
-            {
-              method: "DELETE",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          const data = await res.json();
-
-          if (data.success) {
-            setBookings(bookings.filter((b) => b._id !== bookingId));
-            Swal.fire(
-              "Cancelled!",
-              "Your booking has been cancelled.",
-              "success"
-            );
-          } else {
-            Swal.fire(
-              "Error",
-              data.message || "Failed to cancel booking",
-              "error"
-            );
-          }
-        } catch (error) {
-          console.error(error);
-          Swal.fire("Error", "Something went wrong", "error");
-        }
-      }
     });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      // Delete booking
+      const { data } = await axiosSecure.delete(`/bookings/${bookingId}`);
+
+      if (data.success) {
+        setBookings(bookings.filter((b) => b._id !== bookingId));
+
+        // Update car status
+        await axiosSecure.patch(`/cars/${carId}`, { status: "available" });
+
+        Swal.fire(
+          "Cancelled!",
+          "Your booking has been cancelled and car is now available.",
+          "success"
+        );
+      } else {
+        Swal.fire("Error", "Failed to cancel booking", "error");
+      }
+    } catch (error) {
+      console.error(error);
+      Swal.fire("Error", "Something went wrong", "error");
+    }
   };
 
   if (loading)
@@ -111,25 +90,8 @@ const MyBookings = () => {
 
       {bookings.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 border border-dashed border-gray-300 rounded-2xl bg-gray-50">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-20 w-20 text-gray-400 mb-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 7h18M3 12h18M3 17h18"
-            />
-          </svg>
           <p className="text-gray-500 text-lg font-medium">
             You have no bookings yet.
-          </p>
-          <p className="text-gray-400 mt-2">
-            Start exploring cars and make your first booking today.
           </p>
         </div>
       ) : (
@@ -150,29 +112,22 @@ const MyBookings = () => {
               <h3 className="font-bold text-2xl mb-2 text-gray-900">
                 {booking.carName}
               </h3>
-              <p className="text-gray-600 mb-3 text-sm md:text-base">
-                {booking.description}
-              </p>
 
               <div className="mb-4 space-y-2 text-gray-700">
-                <p className="flex items-center gap-2 mb-1 text-gray-600">
-                  <LuDollarSign className="text-primary" /> Rent per day:{" "}
-                  <strong className="text-gray-800">
-                    BDT. {booking.rentPrice} /-
-                  </strong>
-                </p>
-                <p className="flex items-center gap-2 mb-1 text-gray-600">
-                  <BsFillFuelPumpFill className="text-primary" /> Model:{" "}
-                  <span className="font-medium">{booking.category}</span>
-                </p>
-                <p className="flex items-center gap-2 mb-1 text-gray-600">
-                  <GrUserManager className="text-primary" /> Provider:{" "}
-                  <span className="font-medium">{booking.providerName}</span>
+                <p className="flex items-center gap-2">
+                  <LuDollarSign className="text-primary" /> BDT.{" "}
+                  {booking.rentPrice} /-
                 </p>
                 <p className="flex items-center gap-2">
-                  <GoLocation className="text-primary" />{" "}
-                  <span className="font-semibold">Location:</span>{" "}
-                  {booking.location}
+                  <BsFillFuelPumpFill className="text-primary" />{" "}
+                  {booking.category}
+                </p>
+                <p className="flex items-center gap-2">
+                  <GrUserManager className="text-primary" />{" "}
+                  {booking.providerName}
+                </p>
+                <p className="flex items-center gap-2">
+                  <GoLocation className="text-primary" /> {booking.location}
                 </p>
               </div>
 
@@ -188,13 +143,9 @@ const MyBookings = () => {
                 </span>
               </div>
 
-              <p className="mb-4 text-gray-400 text-sm">
-                Posted on: {new Date(booking.postedAt).toLocaleDateString()}
-              </p>
-
               <button
-                className="cursor-pointer mt-auto bg-linear-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-3 rounded-full shadow-md hover:shadow-xl transition-all"
-                onClick={() => handleDelete(booking._id)}
+                className="cursor-pointer mt-auto bg-red-500 text-white font-semibold py-3 rounded-full shadow-md hover:shadow-xl transition-all"
+                onClick={() => handleDelete(booking._id, booking.carId)}
               >
                 Cancel Booking
               </button>
