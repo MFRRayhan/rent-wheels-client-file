@@ -5,6 +5,7 @@ import { FaCar } from "react-icons/fa";
 import { GoLocation } from "react-icons/go";
 import { GrUserManager } from "react-icons/gr";
 import { LuDollarSign } from "react-icons/lu";
+import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { AuthContext } from "../contexts/AuthContext";
 import useAxiosSecure from "../hooks/useAxiosSecure";
@@ -12,6 +13,7 @@ import useAxiosSecure from "../hooks/useAxiosSecure";
 const MyBookings = () => {
   const { user } = useContext(AuthContext);
   const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -89,10 +91,38 @@ const MyBookings = () => {
       </div>
 
       {bookings.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 border border-dashed border-gray-300 rounded-2xl bg-gray-50">
-          <p className="text-gray-500 text-lg font-medium">
-            You have no bookings yet.
+        <div className="flex flex-col items-center justify-center py-24 px-6 border border-dashed border-gray-300 rounded-2xl bg-linear-to-b from-gray-50 to-white shadow-sm">
+          <div className="flex items-center justify-center w-16 h-16 mb-4 bg-purple-100 text-primary rounded-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-8 h-8"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v3.75m0 3.75h.008v.008H12v-.008zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+            No Bookings Found
+          </h3>
+          <p className="text-gray-500 text-center max-w-md">
+            It looks like you haven’t made any bookings yet. Start exploring
+            cars and make your first reservation today!
           </p>
+
+          <button
+            onClick={() => navigate("/browse-cars")}
+            className="mt-6 px-5 py-2.5 text-sm font-medium text-white bg-primary hover:bg-[#425adf] rounded-lg transition-all duration-300"
+          >
+            Browse Cars
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
