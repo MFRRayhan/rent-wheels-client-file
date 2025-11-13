@@ -29,7 +29,11 @@ function Login() {
       });
       navigate(location.state?.from?.pathname || "/");
     } catch (error) {
-      console.log(error);
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: error.message,
+      });
     }
   };
 
@@ -43,11 +47,7 @@ function Login() {
       });
       navigate(location.state?.from?.pathname || "/");
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Google Login Failed",
-        text: error.message,
-      });
+      console.log(error);
     }
   };
 
