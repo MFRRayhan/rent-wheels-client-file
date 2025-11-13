@@ -9,6 +9,7 @@ import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { AuthContext } from "../contexts/AuthContext";
 import useAxiosSecure from "../hooks/useAxiosSecure";
+import Loader from "./Loader";
 
 const MyBookings = () => {
   const { user } = useContext(AuthContext);
@@ -74,14 +75,7 @@ const MyBookings = () => {
     }
   };
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-gray-500 text-lg animate-pulse">
-          Loading your bookings...
-        </p>
-      </div>
-    );
+  if (loading) return <Loader />;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12 mt-16">

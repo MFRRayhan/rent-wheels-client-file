@@ -11,6 +11,7 @@ import { Link } from "react-router";
 import Swal from "sweetalert2";
 import { AuthContext } from "../contexts/AuthContext";
 import useAxiosSecure from "../hooks/useAxiosSecure";
+import Loader from "./Loader";
 
 const MyListings = () => {
   const { user } = useContext(AuthContext);
@@ -178,11 +179,7 @@ const MyListings = () => {
         </p>
       </div>
 
-      {loading && (
-        <div className="text-lg font-medium text-center text-gray-600">
-          Fetching your cars...
-        </div>
-      )}
+      {loading && <Loader />}
       {error && (
         <div className="font-semibold text-center text-red-500">{error}</div>
       )}
