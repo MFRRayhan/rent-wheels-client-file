@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import FeaturedCars from "../FeaturedCars/FeaturedCars";
 import HeroArea from "../HeroArea";
+import Loader from "../Loader";
 import Testimonials from "../Testimonials";
 import WhyRentWithUs from "../WhyRentWithUs";
 
@@ -25,7 +26,8 @@ const Home = () => {
     <div>
       <HeroArea />
       {loading ? (
-        <p className="text-center mt-10">Loading featured cars...</p>
+        // <p className="text-center mt-10">Loading featured cars...</p>
+        <Loader />
       ) : (
         <FeaturedCars featuredCars={featuredCars} />
       )}

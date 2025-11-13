@@ -29,11 +29,7 @@ function Login() {
       });
       navigate(location.state?.from?.pathname || "/");
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Login Failed",
-        text: error.message,
-      });
+      console.log(error);
     }
   };
 

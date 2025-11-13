@@ -1,4 +1,3 @@
-// src/pages/Register.jsx
 import { useContext, useState } from "react";
 import { FaEye, FaEyeSlash, FaGoogle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router";
@@ -31,16 +30,11 @@ function Register() {
     }
 
     try {
-      // 1️⃣ Create user with email/password
       const userCredential = await createUser(email, password);
 
-      // 2️⃣ Update Firebase profile
       await updateUserProfile({ displayName: name, photoURL });
 
-      // 3️⃣ Prepare user data for backend
       const newUser = { name, email, photoURL, createdAt: new Date() };
-
-      // 4️⃣ Send to backend
       const response = await fetch(
         "https://rent-wheels-api-server.vercel.app/users",
         {
@@ -94,7 +88,6 @@ function Register() {
       navigate("/");
     } catch (error) {
       console.error(error);
-      Swal.fire("Error", error.message, "error");
     }
   };
 
